@@ -1,0 +1,46 @@
+# Import necessary libraries
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
+
+# Load the data (replace with your actual dataset)
+# Assuming your dataset is 'health_risk.csv' with columns: BMI, exercise, eating_habits, and risk_category (low/medium/high)
+data = pd.read_csv("health_risk.csv")
+
+# Feature and target variables
+X = data[['BMI', 'exercise', 'eating_habits']]  # Features
+y = data['risk_category']  # Target (low, medium, high)
+
+# Train-test split (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train a RandomForest classifier
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted', labels=y.unique())  # weighted for multi-class
+recall = recall_score(y_test, y_pred, average='weighted', labels=y.unique())
+
+# Print evaluation metrics
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Precision: {precision:.2f}")
+print(f"Recall: {recall:.2f}")
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred, labels=y.unique())
+
+# Heatmap of the confusion matrix
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm', xticklabels=['Low', 'Medium', 'High'], yticklabels=['Low', 'Medium', 'High'])
+plt.title("Confusion Matrix - Health Risk Classification")
+plt.ylabel("True Label")
+plt.xlabel("Predicted Label")
+plt.show()
